@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.7](https://github.com/grpc/grpc-rust/compare/tonic-v0.14.6...tonic-v0.14.7) - 2026-08-17
+
+### Fixed
+
+- *(status)* map h2 FRAME_SIZE_ERROR to Code::Internal ([#2641](https://github.com/grpc/grpc-rust/pull/2641))
+- *(codec)* respect server's enabled encodings when selecting response compression ([#2655](https://github.com/grpc/grpc-rust/pull/2655))
+
+### Other
+
+- support immediate cancellation of streams without sending End-of-Stream ([#2791](https://github.com/grpc/grpc-rust/pull/2791))
+- wrap connection_timeout in Fuse to prevent panic ([#2780](https://github.com/grpc/grpc-rust/pull/2780))
+- License update ([#2749](https://github.com/grpc/grpc-rust/pull/2749))
+
 ### Fixed
 
 - *(codec)* respect server's enabled encodings when selecting response compression, fixing a case where a server configured with `send_compressed(Zstd)` would still gzip responses when the client listed `gzip` before `zstd` in `grpc-accept-encoding`
