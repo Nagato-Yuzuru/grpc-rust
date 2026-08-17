@@ -239,6 +239,60 @@ impl ChannelBuilder {
     }
 }
 
+#[cfg(test)]
+mod test {
+
+    use super::*;
+    use crate::credentials::LocalChannelCredentials;
+
+    #[test]
+    fn build_applies_scheme() {
+        #[derive(Default)]
+        struct TestCase {
+            name: &'static str,
+            input: &'static str,
+            want_scheme: &'static str,
+            want_str: &'static str,
+        }
+        let test_cases = vec![
+            TestCase {
+                name: "no scheme falls back to dns",
+                input: "foo.googleapis.com:8080",
+                want_scheme: "dns",
+                want_str: "dns:///foo.googleapis.com:8080",
+            },
+            TestCase {
+                name: "unregistered scheme falls back to dns",
+                input: "zookeeper://zk.example.com:9900/example_service",
+                want_scheme: "dns",
+                want_str: "dns:////zk.example.com:9900/example_service",
+            },
+            TestCase {
+                name: "registered scheme is left alone",
+                input: "dns:///foo.googleapis.com:8080",
+                want_scheme: "dns",
+                want_str: "dns:///foo.googleapis.com:8080",
+            },
+        ];
+        for tc in test_cases {
+            let channel =
+                Channel::builder(tc.input, Arc::new(LocalChannelCredentials::new())).build();
+            assert_eq!(
+                channel.inner.target.scheme(),
+                tc.want_scheme,
+                "test case {} failed on scheme",
+                tc.name
+            );
+            assert_eq!(
+                &channel.inner.target.to_string(),
+                tc.want_str,
+                "test case {} failed on target string",
+                tc.name
+            );
+        }
+    }
+}
+
 struct PersistentChannel {
     active_channel: Mutex<Option<Arc<ActiveChannel>>>,
 
